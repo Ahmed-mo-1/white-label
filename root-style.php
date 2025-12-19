@@ -152,6 +152,26 @@ div.woocommerce-message.updated {
 	display: none
 }
 
+.menu-top {
+    display: none;
+}
+
+#toplevel_page_logout-link,
+#toplevel_page_modern-plugin-manager,
+#toplevel_page_modern-permalinks,
+#toplevel_page_modern-settings,
+toplevel_page_modern-plugins,
+#toplevel_page_modern-users,
+#toplevel_page_modern-orders-list,
+#toplevel_page_egpay-admin-settings,
+#toplevel_page_modern-content-manager,
+#toplevel_page_modern-dark-report,
+#toplevel_page_front-end-link
+{
+	display: block !important
+}
+
+
 
 #astra-optin-notice, .notice.e-notice.e-notice--extended {
 	display: none
