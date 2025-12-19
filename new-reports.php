@@ -1,10 +1,5 @@
 <?php
 
-
-/**
- * Modern Dark Mode WooCommerce Report Page
- */
-
 add_action('admin_menu', 'register_modern_dark_report_page');
 
 function register_modern_dark_report_page() {
@@ -22,21 +17,21 @@ function register_modern_dark_report_page() {
 function render_modern_dark_report() {
     global $wpdb;
 
-    // 1. DATA QUERIES
-    // Get total revenue (last 30 days)
-    $total_revenue = $wpdb->get_var("SELECT SUM(total_sales) FROM {$wpdb->prefix}wc_order_stats WHERE date_created > NOW() - INTERVAL 30 DAY");
-    
-    // Get total orders (last 30 days)
-    $total_orders = $wpdb->get_var("SELECT COUNT(order_id) FROM {$wpdb->prefix}wc_order_stats WHERE date_created > NOW() - INTERVAL 30 DAY");
 
-    // Get Recent Sales List
+    $total_revenue = $wpdb->get_var("
+		SELECT SUM(total_sales) FROM {$wpdb->prefix}wc_order_stats WHERE date_created > NOW() - INTERVAL 30 DAY
+	");
+    
+    $total_orders = $wpdb->get_var("
+		SELECT COUNT(order_id) FROM {$wpdb->prefix}wc_order_stats WHERE date_created > NOW() - INTERVAL 30 DAY
+	");
+
     $recent_sales = $wpdb->get_results("
         SELECT order_id, total_sales, date_created 
         FROM {$wpdb->prefix}wc_order_stats 
         ORDER BY date_created DESC LIMIT 5
     ");
 
-    // 2. STYLES (Modern Dark Theme)
     ?>
     <style>
         #wpcontent { background: var(--background-color); } /* Deep Dark Background */
@@ -93,6 +88,11 @@ function render_modern_dark_report() {
             color: #e2e8f0;
             border-bottom: 1px solid #334155;
         }
+
+		.custom-table tr:last-of-type td {
+			border: none;
+		}
+
         .order-badge {
             background: #334155;
             padding: 4px 10px;
