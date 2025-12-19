@@ -1,0 +1,2984 @@
+<?php
+
+/*
+Plugin name: white label
+*/
+
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+add_action('plugins_loaded', function () {
+    define('WHITE_LABEL_PLUGIN_URL', plugin_dir_url(__FILE__));
+});
+
+
+add_filter('use_block_editor_for_post', '__return_false', 10);
+add_filter('use_block_editor_for_page', '__return_false', 10);
+
+
+add_action('admin_enqueue_scripts', function() {
+    // Remove Dashicons (optional)
+    wp_deregister_style('dashicons');
+
+    // Remove default WP admin CSS
+    wp_dequeue_style('wp-admin');
+    wp_dequeue_style('admin-menu');
+    wp_dequeue_style('colors');
+
+    // Remove default WP admin JS
+    wp_dequeue_script('admin-menu');
+});
+
+add_filter('show_admin_bar', '__return_false');
+
+/**/
+
+add_action('adminmenu', function() { 
+    $logo = WHITE_LABEL_PLUGIN_URL . 'imgs/1.png';
+    echo '<div style="order: -1; width: 100%; margin: auto" class="custom-admin-logo">
+            <img style="width: 100%" src="' . esc_url($logo) . '" alt="Logo">
+          </div>';
+});
+
+
+// Add logo + front-end + logout buttons
+add_action('admin_menu', function() {
+
+
+    // 2. Add front-end button
+    add_menu_page(
+        'Visit Site',
+        'Front-end',
+        'read',
+        'front-end-link',
+        function() {
+            wp_redirect(home_url());
+            exit;
+        },
+        'dashicons-admin-site',
+        1
+    );
+
+    // 3. Add logout button
+    add_menu_page(
+        'Logout',
+        'Logout',
+        'read',
+        'logout-link',
+        function() {
+            wp_logout();
+            wp_redirect(home_url('/wp-admin'));
+            exit;
+        },
+        'dashicons-shield-alt',
+        2
+    );
+});
+
+
+
+add_action('wp_before_admin_bar_render', function() {
+    global $wp_admin_bar;
+    $wp_admin_bar->remove_node('wp-logo');
+});
+
+
+
+
+
+/* ----------------------------------------------------------
+   Modern WP Admin UI – Single File Version
+   Add this entire block into your theme's functions.php
+-----------------------------------------------------------*/
+
+add_action('admin_head', function () { ?>
+<style>
+
+:root {
+	--primary-color : #505050;
+	--background-color : #000;
+	--background-light-color : #252525;
+	--text-color : #fff;
+}
+* {
+	padding: 0;
+	margin: 0;
+	box-sizing: border-box;
+	color: white;
+	font-size: 12px;
+	font-family: poppins
+}
+
+body {
+	font-family: poppins;
+	background: var(--background-light-color);
+}
+
+
+/* Target the scrollbar */
+::-webkit-scrollbar {
+  width: 4px; /* width of vertical scrollbar */
+  height: 4px; /* height of horizontal scrollbar */
+}
+
+/* Track (background) */
+::-webkit-scrollbar-track {
+  background: none;
+  border-radius: 6px;
+}
+
+/* Handle (thumb) */
+::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border-radius: 6px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-color);
+}
+
+
+
+
+#wpwrap {display: flex}
+#wp-auth-check-wrap {display: none}
+
+.wp-menu-image,wp-menu-image svg {
+	display: none
+}
+
+#adminmenumain {
+	background: var(--background-color);
+	padding: 10px;
+	color: white
+}
+
+#adminmenumain a{
+	color: white
+}
+
+#wpadminbar {display: none}
+
+#screen-options-wrap , #screen-meta, #screen-meta-links, .woocommerce-layout__header {
+	display: none
+}
+
+#wpcontent {
+	width: 100%;
+	background: var(--background-light-color);
+}
+
+.wp-submenu-head {display: none}
+
+
+button, input[type="submit"]{
+	border: none;
+    background: var(--primary-color);
+    color: white;
+    padding: 0;
+    border-radius: 0;
+    height: 40px;
+    padding-inline: 10px;
+}
+
+input, select {
+	border-radius: 20px
+}
+
+ul {
+list-style: none
+}
+
+
+.alignleft.actions {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 14px;
+    gap: 10px;
+    overflow: hidden;
+}
+
+#adminmenumain {
+    background: #202020;
+    padding: 14px;
+    color: white;
+    height: 100dvh;
+    overflow: auto;
+	width: 200px;
+	position: fixed;
+	top: 0;
+	border-right: 1px solid #ccc
+}
+
+a {
+    text-decoration: none;
+}
+
+ul#adminmenu
+ {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+
+#adminmenu li {
+    padding: 0;
+}
+
+/*
+li:has(ul) {
+    background: var(--background-light-color);
+    padding: 12px !important;
+    border-radius: 16px;
+}
+*/
+
+/*
+ul#adminmenu > li:not(:has(ul)) {
+    background: var(--background-light-color);
+    padding: 12px !important;
+    border-radius: 16px;
+}
+
+li:has(ul):hover, ul#adminmenu > li:not(:has(ul)):hover {
+	filter: brightness(1.2)
+}
+*/
+.wp-not-current-submenu.wp-menu-separator, #collapse-menu {
+	display: none
+}
+
+div#wpbody {
+/*
+    height: 94dvh;
+    overflow: auto;
+    box-shadow: 2px 2px 10px black;
+    border-radius: 16px;
+    padding: 10px;
+*/
+}
+
+#adminmenumain > :not(#adminmenuwrap) {
+    display: none !important;
+}
+
+
+
+
+
+div#adminmenuwrap {
+    position: relative !important;
+	top: 0 !Important
+}
+
+
+
+div.woocommerce-message.updated {
+	display: none
+}
+
+
+
+
+
+
+p.search-box {
+    display: flex;
+    width: auto;
+    margin: 0;
+    width: fit-content;
+    background: none;
+    border: none;
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+
+
+input#post-search-input {
+    background: none;
+    border: 0;
+}
+
+
+
+/* General page wrapper */
+.wrap {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px 30px;
+    border-radius: 10px;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #333;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+
+.wrap h2 {
+    font-size: 1.5em;
+    margin-top: 30px;
+    color: #222;
+}
+
+.wrap h2 span.count {
+    color: #555;
+    font-weight: normal;
+    font-size: 0.9em;
+}
+
+/* Paragraphs */
+
+.wrap a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.wrap a:hover {
+    text-decoration: underline;
+}
+
+/* Current version and update info */
+.wp-current-version {
+    font-weight: bold;
+    color: #d54e21;
+}
+
+.update-last-checked {
+    font-size: 0.9em;
+    color: #666;
+}
+
+/* Auto-update notice */
+.auto-update-status {
+    background-color: #151515;
+    border-left: 4px solid #ffb900;
+    padding: 10px 15px;
+    border-radius: 5px;
+}
+
+/* Response message */
+.response {
+    background-color: #151515;
+    border-left: 4px solid #46b450;
+    padding: 10px 15px !important;
+    font-size: 12px !important;
+    border-radius: 5px;
+}
+
+/* Buttons */
+.button {
+    display: inline-block;
+    background-color: #0073aa;
+    color: #fff;
+    padding: 8px 18px;
+    font-size: 0.95em;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+
+.button:hover {
+    opacity: 0.8;
+	text-decoration: none 
+}
+
+/* Tables */
+.widefat {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.widefat th, .widefat td {
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    vertical-align: middle;
+}
+
+.widefat th {
+    background-color: #f1f1f1;
+    text-align: left;
+}
+
+.check-column {
+    width: 40px;
+    text-align: center;
+}
+
+.plugin-title img {
+    width: 32px;
+    height: 32px;
+    vertical-align: middle;
+    margin-right: 10px;
+    border-radius: 4px;
+}
+
+.upgrade p {
+    margin: 0;
+}
+
+/* Forms */
+form.upgrade {
+    margin-top: 10px;
+}
+
+/* Highlight links inside status messages */
+.auto-update-status a, .response a {
+    font-weight: bold;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .wrap {
+        padding: 15px 20px;
+    }
+
+    .widefat th, .widefat td {
+        padding: 8px;
+    }
+
+    .plugin-title img {
+        width: 24px;
+        height: 24px;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* General wrapper */
+.wrap {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 20px 30px;
+    border-radius: 10px;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #333;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* Page heading */
+.wp-heading-inline {
+    font-size: 2em;
+    margin-right: 15px;
+    color: #0073aa;
+}
+
+/* Add Post button */
+.page-title-action {
+    display: inline-block;
+    background-color: #0073aa;
+    color: #fff;
+    padding: 6px 16px;
+    font-size: 0.95em;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+
+.page-title-action:hover {
+    background-color: #005177;
+}
+
+/* Sub-sub navigation */
+.subsubsub {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.95em;
+}
+
+.subsubsub li {
+    display: inline;
+}
+
+.subsubsub li a {
+    text-decoration: none;
+    color: #aaa;
+    margin-right: 5px;
+}
+
+.subsubsub li a.current {
+    font-weight: bold;
+    color: #fff;
+}
+
+/* Search box */
+.search-box input[type="search"] {
+    padding: 6px 10px;
+    border: none;
+    border-radius: 4px;
+    width: 200px;
+    color: white;
+    background: black;
+	outline: none;
+}
+
+
+/* Tables */
+.wp-list-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.wp-list-table th,
+.wp-list-table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #e1e1e1;
+    vertical-align: middle;
+}
+
+.wp-list-table th {
+    background-color: #f1f1f1;
+    text-align: left;
+    font-weight: bold;
+}
+
+.wp-list-table tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+.wp-list-table tr:hover {
+    background-color: #f0f8ff;
+}
+
+/* Checkboxes */
+.check-column {
+    width: 40px;
+    text-align: center;
+}
+
+/* Row actions */
+.row-actions {
+    font-size: 0.85em;
+    margin-top: 5px;
+}
+
+.row-actions a,
+.row-actions button {
+    margin-right: 5px;
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.row-actions a:hover,
+.row-actions button:hover {
+    text-decoration: underline;
+}
+
+/* Inline edit / quick edit */
+.inline-edit-wrapper {
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 6px;
+    margin-top: 10px;
+}
+
+.inline-edit-wrapper fieldset {
+}
+
+.inline-edit-wrapper .title {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* Inputs and selects */
+.inline-edit-wrapper input[type="text"],
+.inline-edit-wrapper input[type="search"],
+.inline-edit-wrapper select,
+.inline-edit-wrapper textarea {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+
+/* Pagination */
+.tablenav-pages {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.tablenav-pages .button {
+}
+
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .wrap {
+        padding: 15px 20px;
+    }
+
+    .search-box input[type="search"] {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+
+    .page-title-action {
+        margin-top: 10px;
+        display: block;
+    }
+}
+
+
+
+#no-items-selected {
+	display: none
+}
+
+
+
+
+#current-page-selector {
+    border-radius: 20px;
+    height: 40px;
+    text-align: center;
+    color: black;
+}
+
+
+span.inline.hide-if-no-js {
+    display: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+/* Top-level Links */
+#adminmenu li.menu-top > a {
+    display: flex !important;
+    align-items: center !important;
+	padding: 0 !important;
+    color: var(--text-color) !important;
+    text-decoration: none !important;
+    font-weight: 400 !important;
+    transition: all 0.3s ease !important;
+    background-color: none !important;
+    cursor: pointer !important;
+	font-size: 12px;
+
+    padding: 4px 12px !important;
+    border-radius: 16px;
+}
+
+#adminmenu li.menu-top > a:hover {
+    color: var(--primary-color) !important;
+	filter: brightness(1.2)
+}
+
+/* Submenus */
+#adminmenu .wp-submenu-wrap {
+    display: none;
+    background-color: none;
+    border-left: 1px solid var(--primary-color) !important;
+    /* padding: 12px; */
+    background: var(--background-light-color);
+    margin-top: 10px;
+    border-radius: 12px;
+    /* width: 90%; */
+}
+
+a.current.menu-top.toplevel_page_client-data, a.wp-not-current-submenu:hover {
+    display: flex !important;
+    align-items: center !important;
+    padding: 0 !important;
+    color: var(--text-color) !important;
+    text-decoration: none !important;
+    font-weight: 400 !important;
+    transition: all 0.3s ease !important;
+    background-color: none !important;
+    cursor: pointer !important;
+    font-size: 12px;
+    background: var(--background-light-color);
+    padding: 7px 12px !important;
+    border-radius: 16px;
+}
+
+#adminmenu .wp-submenu li a  {
+    display: block !important;
+    padding: 8px 12px !important;
+    color: #555555 !important;
+    text-decoration: none !important;
+    font-weight: 400 !important;
+    font-size: 14px !important;
+    transition: all 0.2s ease !important;
+}
+
+#adminmenu .wp-submenu li a:hover {
+    display: block !important;
+    padding: 8px 12px !important;
+    color: #fff !important;
+    text-decoration: none !important;
+    font-weight: 400 !important;
+    font-size: 14px !important;
+    transition: all 0.2s ease !important;
+}
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* General form styling */
+.wrap form {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    width: 100%;
+    margin: 20px auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.wrap h1 {
+    font-size: 28px;
+    color: #333;
+}
+
+.form-table th {
+    text-align: left;
+    padding: 10px;
+    vertical-align: top;
+    width: 220px;
+    color: #555;
+}
+
+.form-table td {
+    padding: 10px;
+}
+
+/* Number inputs and selects */
+input[type="number"], select {
+    padding: 6px 10px;
+    border: 0;
+    border-radius: 4px;
+    font-size: 14px;
+    width: 150px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+input[type="number"]:focus, select:focus {
+    border-color: #0073aa;
+    box-shadow: 0 0 3px rgba(0,115,170,0.5);
+    outline: none;
+}
+
+/* Apple-style toggle switch */
+.toggle-wrapper {
+    display: inline-block;
+    position: relative;
+    width: 50px;
+    height: 28px;
+}
+
+.toggle-wrapper input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0;
+    right: 0; bottom: 0;
+    background-color: #ccc;
+    border-radius: 34px;
+    transition: 0.4s;
+}
+
+.slider::before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    border-radius: 50%;
+    transition: 0.4s;
+}
+
+.toggle-wrapper input:checked + .slider {
+    background-color: #0073aa;
+}
+
+.toggle-wrapper input:checked + .slider::before {
+    transform: translateX(22px);
+}
+
+/* Optional shadow effect */
+.slider::before {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+/* Labels */
+label {
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Submit button */
+.button-primary {
+    background-color: #0073aa;
+    border-color: #0073aa;
+    color: #fff;
+    padding: 8px 18px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.button-primary:hover {
+    background-color: #005f8d;
+    border-color: #005f8d;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Hide native checkbox/radio appearance */
+input[type="checkbox"],
+input[type="radio"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 40px;
+    height: 22px;
+    background: #ccc;
+    border-radius: 11px;
+    position: relative;
+    outline: none;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+/* The circular knob */
+input[type="checkbox"]::after,
+input[type="radio"]::after {
+    content: "";
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.3s, background 0.3s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+/* Checked state */
+input[type="checkbox"]:checked,
+input[type="radio"]:checked {
+    background: var(--primary-color);
+}
+
+input[type="checkbox"]:checked::after,
+input[type="radio"]:checked::after {
+    transform: translateX(18px);
+}
+
+/* Optional hover effect */
+input[type="checkbox"]:hover,
+input[type="radio"]:hover {
+    background: var(--primary-color);
+}
+
+/* Space between toggle and label text */
+label > input[type="checkbox"],
+label > input[type="radio"] {
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+/* Ensure proper alignment with text */
+label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.awaiting-mod, .count-0{
+	display: none
+}
+
+
+.wrap form {
+    font-family: poppins;
+    max-width: 100%;
+    margin: auto;
+    background: #202020;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: none;
+    color: white !important;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    border: 1px solid #ccc;
+}
+
+div#wpbody {
+    margin-left: 200px;
+	min-height: 100dvh
+} 
+
+.wrap {
+    max-width: 100%;
+    width: 100%;
+    margin: 40px auto;
+    padding: 20px 30px;
+    border-radius: 10px;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #fff;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    justify-content: start;
+    align-items: start;
+}
+
+.wp-list-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: black !important;
+    border-radius: 6px;
+    overflow: hidden;
+    color: white;
+}
+
+.wp-list-table th {
+    background-color: black;
+    text-align: left;
+    font-weight: bold;
+    color: white;
+}
+
+.widefat th, .widefat td {
+    padding: 10px 12px;
+    border: none !important;
+    vertical-align: middle;
+    background: #252525 !important;
+}
+
+.wrap h1,
+.wrap h2,
+.wrap h3,
+.wrap h4,
+.wrap h5,
+.wrap h6 {
+	padding: 0;
+	margin: 0;
+	color: white
+}
+
+hr {
+	display: none
+}
+
+.button, .button.action, .button.button-primary, .button.save {
+    display: inline-block;
+    background-color: var(--primary-color);
+    color: #fff;
+    padding: 6px 14px;
+    font-size: 0.9em;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+
+
+
+.button, .button.action, .button.button-primary, .button.save {
+    display: inline-block;
+    background-color: var(--primary-color);
+    color: #fff;
+    padding: 6px 14px;
+    font-size: 0.9em;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s;
+    display: flex;
+    height: 28px;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.page-title-action {
+    display: inline-block;
+    background-color: var(--primary-color);
+    color: #fff !important;
+    padding: 6px 16px;
+    font-size: 0.95em;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+
+
+
+/*table*/
+
+.widefat th, .widefat td {
+    padding: 0px 2px;
+    border: none !important;
+    vertical-align: middle;
+    background: #252525 !important;
+}
+
+.column-description, .column-auto-updates, .screen-reader-text{
+	display: none
+}
+th.check-column {
+    width: 170px;
+}
+
+.check-column {
+    width: 40px;
+    text-align: start;
+}
+
+span.pagination-links {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 6px;
+}
+
+
+.plugin-update {
+display: none
+}
+
+.plugin-title strong {
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.wp-list-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 0;
+    background-color: transparent !important;
+    border-radius: 6px;
+    overflow: hidden;
+    color: white;
+    padding: 20px !important;
+    border: 1px solid white !important;
+}
+
+
+tfoot, .toggle-row, .label-covers-full-cell {
+	display: none
+}
+
+.widefat th, .widefat td {
+    padding: 8px 10px;
+    border: none !important;
+    vertical-align: middle;
+    background: #252525 !important;
+}
+
+.bulkactions {
+    margin: 0;
+    display: flex;
+    gap: 6px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+
+.tablenav.bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 100%;
+}
+
+.tablenav.top {
+	display : none;
+}
+
+.clear {
+display: none
+}
+
+select, option {
+	background: none
+}
+option {
+	color: black
+}
+
+.activate {
+	color: var(--primary-color)
+}
+
+.hidden  {
+	display: none
+}
+
+
+.wp-submenu.wp-submenu-wrap {
+	margin: 6px 0 0 !important
+}
+
+#wpbody-content {
+	display: flex
+}
+
+.notice-dismiss {display: none}
+
+
+
+
+
+.handle-actions.hide-if-no-js {
+    display: none;
+}
+
+
+/*dashbaord*/
+
+/* ========== Global Reset ========== */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background: #f4f6f8;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+    color: #1e1e1e;
+}
+
+/* ========== Wrapper ========== */
+.wrap {
+    max-width: 1400px;
+    margin: 20px auto;
+}
+
+
+/* ========== Notices ========== */
+.notice, .updated, .woocommerce-message {
+    border-radius: 8px;
+    padding: 2px 20px;
+    border-left: 5px solid #3858e9;
+    background: #505050;
+}
+
+.notice p,
+.updated p {
+    margin: 8px 0;
+}
+
+.woocommerce-message strong {
+    color: #d63638;
+}
+
+.notice-dismiss {
+    text-decoration: none;
+}
+
+/* Buttons */
+.button,
+.button-primary {
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-weight: 500;
+}
+
+.button-primary {
+    background: #3858e9;
+    border-color: #3858e9;
+}
+
+.button-primary:hover {
+    background: #2f47c7;
+}
+
+/* ========== Dashboard Layout ========== */
+#dashboard-widgets-wrap {
+    margin-top: 20px;
+}
+
+.postbox {
+    background: #ffffff;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    margin-bottom: 20px;
+}
+
+.postbox-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.postbox-header h2 {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.postbox .inside {
+    padding: 18px;
+}
+
+/* ========== Site Health Widget ========== */
+.health-check-widget-title-section.orange {
+    color: #d97706;
+}
+
+.site-health-progress svg circle {
+    stroke-width: 12;
+    stroke: #e5e7eb;
+}
+
+.site-health-progress svg #bar {
+    stroke: #f59e0b;
+}
+
+/* ========== WooCommerce Setup ========== */
+.dashboard-widget-finish-setup {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.dashboard-widget-finish-setup img {
+    max-width: 160px;
+}
+
+.progress-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+}
+
+/* ========== At a Glance ========== */
+#dashboard_right_now ul li {
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+
+#wp-version {
+    font-weight: 500;
+}
+
+.search-engines-info {
+    margin-top: 8px;
+    color: #d63638;
+}
+
+/* ========== Activity Widget ========== */
+.activity-block h3 {
+    font-size: 15px;
+    margin-bottom: 10px;
+}
+
+.dashboard-comment-wrap {
+    background: #f9fafb;
+    padding: 12px;
+    border-radius: 8px;
+}
+
+.dashboard-comment-wrap blockquote {
+    border-left: 3px solid #3858e9;
+    padding-left: 10px;
+    margin: 10px 0;
+}
+
+/* ========== Quick Draft ========== */
+#quick-press input[type="text"],
+#quick-press textarea {
+    width: 100%;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    padding: 8px 10px;
+}
+
+#quick-press textarea {
+    resize: vertical;
+}
+
+/* ========== Welcome Panel ========== */
+.welcome-panel {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.welcome-panel h2 {
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.welcome-panel-column {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 16px;
+    transition: transform 0.2s ease;
+}
+
+.welcome-panel-column:hover {
+    transform: translateY(-4px);
+}
+
+/* ========== Links ========== */
+a {
+    color: #3858e9;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* ========== Responsive ========== */
+@media (max-width: 1024px) {
+    .dashboard-widget-finish-setup {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .wrap {
+        padding: 0 15px;
+    }
+}
+
+
+/* ========== THEME COMPATIBILITY OVERRIDE ========== */
+
+/* 1. Fix Postboxes (Dashboard Widgets) */
+.postbox {
+    background: var(--background-light-color) !important;
+    border: 1px solid #333 !important;
+    border-radius: 12px !important;
+    color: var(--text-color) !important;
+}
+
+.postbox-header {
+    border-bottom: 1px solid #333 !important;
+    background: rgba(255, 255, 255, 0.02) !important;
+}
+
+.postbox-header h2 {
+    color: var(--text-color) !important;
+    font-weight: 600 !important;
+}
+
+/* 2. Specific Widget Fixes (At a Glance / Activity) */
+#dashboard_right_now ul li, 
+.activity-block h3, 
+.dashboard-comment-wrap {
+    color: var(--text-color) !important;
+    background: transparent !important;
+}
+
+.dashboard-comment-wrap {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid #333 !important;
+}
+
+.dashboard-comment-wrap blockquote {
+    border-left-color: var(--primary-color) !important;
+}
+
+/* 3. Quick Draft Inputs */
+#quick-press input[type="text"], 
+#quick-press textarea {
+    background: #111 !important;
+    border: 1px solid #444 !important;
+    color: #fff !important;
+    border-radius: 8px !important;
+}
+
+/* 4. Site Health & Progress Circles */
+.site-health-progress svg #bar {
+    stroke: var(--primary-color) !important;
+}
+
+.health-check-widget-title-section.orange {
+    color: #ff9800 !important; /* Keep warning color visible */
+}
+
+/* 5. Welcome Panel Fix */
+.welcome-panel {
+    background: var(--background-color) !important;
+    border: 1px solid var(--primary-color) !important;
+    color: white !important;
+}
+
+.welcome-panel-column {
+    background: transparent !important;
+}
+
+/* 6. Fix for any remaining "Blue" Links in the dashboard */
+#dashboard-widgets-wrap a {
+    color: var(--primary-color) !important;
+}
+
+#dashboard-widgets-wrap a:hover {
+    filter: brightness(1.3);
+}
+
+/* 7. Column Arrangement for a cleaner "End" */
+@media (min-width: 800px) {
+    #dashboard-widgets {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+    .metabox-holder .postbox-container {
+        width: 100% !important;
+    }
+}
+
+
+
+label[for = "plugin-search-input"] {
+	display: none
+}
+
+
+/*plugins*/
+
+div#the-list {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.plugin-card-bottom {display: none}
+a.thickbox.open-plugin-details-modal {
+    font-size: 0px;
+}
+
+a.thickbox.open-plugin-details-modal {
+    font-size: 0px;
+    width: 100%;
+    display: flex;
+    height: 100%;
+    aspect-ratio: 1;
+	
+}
+
+#update-plugins-table a.thickbox.open-plugin-details-modal {
+	display: none
+}
+
+img.plugin-icon, .plugin-icon {
+    max-width: 60%;
+    aspect-ratio: 1;
+    max-height: 60%;
+    object-fit: cover;
+    margin: auto;
+    border: 2px solid wheat;
+    border-radius: 35px;
+}
+
+.plugin-dependencies.notice.notice-alt.notice-info.inline {
+	display: none
+}
+
+ul.plugin-action-buttons {
+    display: flex;
+    width: 100%;
+}
+
+ul.plugin-action-buttons  li {
+    width: 100%;
+}
+
+li:has(.open-plugin-details-modal) {
+	display: none
+}
+
+button.install-now.button.button-disabled {
+    width: 100%;
+    filter: saturate(0);
+}
+
+
+
+.wp-list-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 0;
+    background-color: transparent !important;
+    border-radius: 6px;
+    overflow: hidden;
+    color: white;
+    padding: 20px !important;
+    border: 0 !important;
+}
+
+.open-plugin-details-modal:has(canvas) img {
+	display: none
+}
+
+
+form.search-form.search-plugins {
+    width: auto;
+    max-width: 100%;
+    display: flex;
+    flex-direction: row;
+    padding: 0;
+    overflow: hidden;
+    border-radius: 19px;
+    margin: 0;
+}
+
+form.search-form.search-plugins label{ 
+	display: none
+}
+
+input#search-plugins {
+    background: none;
+    border: none;
+	padding: 0 10px 
+}
+
+.filter-links, .install-help, .wp-heading-inline, .upload-view-toggle.page-title-action {
+	display: none
+}
+
+.screen-reader-text + p {
+	display: none !important
+}
+
+form.wp-upload-form {
+    padding: 0;
+    flex-direction: row;
+    width: fit-content;
+    align-items: center;
+    border-radius: 16px;
+    overflow: hidden;
+    padding-left: 10px;
+}
+
+.plugins-popular-tags-wrapper {
+	display: none
+}
+</style>
+
+<style>
+
+div#TB_window {
+    display: none;
+}
+
+div#ed_toolbar {
+    display: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*payment*/
+
+/* Container & Base Styles */
+.wrap.woocommerce {
+    background-color: #121212;
+    color: #e0e0e0;
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+/* Tabs Navigation */
+.nav-tab-wrapper.woo-nav-tab-wrapper {
+    border-bottom: 1px solid #333;
+    margin-bottom: 24px;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+}
+
+.nav-tab {
+    background: #1e1e1e;
+    border: 1px solid #333;
+    border-bottom: none;
+    color: #b0b0b0;
+    padding: 10px 16px;
+    border-radius: 8px 8px 0 0;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.nav-tab:hover {
+    background: #252525;
+    color: #fff;
+}
+
+.nav-tab-active, 
+.nav-tab-active:hover {
+    background: #3858e9; /* Modern blue accent */
+    border-color: #3858e9;
+    color: #fff;
+    font-weight: 600;
+}
+
+/* Payment List Item Card */
+.woocommerce-list__item {
+    background: #1e1e1e;
+    border: 1px solid #333;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.woocommerce-list__item:hover {
+    border-color: #444;
+    transform: translateY(-2px);
+}
+
+.woocommerce-list__item-inner {
+    padding: 20px;
+    display: flex;
+    align-items: center;
+}
+
+/* Typography */
+.woocommerce-list__item-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.woocommerce-list__item-content {
+    color: #a0a0a0;
+    font-size: 14px;
+    margin-top: 4px;
+    display: block;
+}
+
+/* Badges & Pills */
+.woocommerce-pill {
+    background: #2c2c2c;
+    color: #cfcfcf;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.woocommerce-status-badge--info {
+    background: rgba(56, 88, 233, 0.2);
+    color: #7da1ff;
+    border: 1px solid rgba(56, 88, 233, 0.3);
+}
+
+/* Form Controls & Country Select */
+.components-button.components-country-select-control__button {
+    background: #252525;
+    border: 1px solid #444;
+    color: #fff;
+    border-radius: 6px;
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.components-country-select-control__label {
+    color: #888;
+    margin-right: 5px;
+}
+
+/* Drag Handle and Icons */
+.drag-handle svg {
+    fill: #555;
+}
+
+.drag-handle:hover svg {
+    fill: #888;
+}
+
+/* Payment Logos Container */
+.woocommerce-woopayments-payment-methods-logos {
+    margin-top: 15px;
+    display: flex;
+    gap: 8px;
+}
+
+/* Ensure white-background SVGs don't look jarring */
+.woocommerce-woopayments-payment-methods-logos svg {
+    border-radius: 4px;
+    filter: brightness(0.9);
+}
+
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Hide all submenus initially
+    document.querySelectorAll('#adminmenu .wp-submenu-wrap').forEach(function (submenu) {
+        submenu.style.display = 'none';
+    });
+
+    // Toggle submenu on click
+    document.querySelectorAll('#adminmenu li.menu-top > a').forEach(function (link) {
+        link.addEventListener('click', function (e) {
+            const submenu = link.parentElement.querySelector('.wp-submenu-wrap');
+
+            // If there is a submenu
+            if (submenu) {
+                e.preventDefault();
+
+                // Close all other submenus
+                document.querySelectorAll('#adminmenu .wp-submenu-wrap').forEach(function (other) {
+                    if (other !== submenu) {
+                        other.style.display = 'none';
+                    }
+                });
+
+                // Toggle this submenu
+                submenu.style.display =
+                    submenu.style.display === 'none' ? 'block' : 'none';
+            }
+            // If no submenu → link works normally
+        });
+    });
+});
+
+
+</script>
+
+<?php });
+
+
+/* ---------------------------------------------
+   ADMIN BRANDING CUSTOMIZATIONS
+----------------------------------------------*/
+
+// 1. Change footer text
+add_filter('admin_footer_text', function () {
+    return ;
+});
+
+// 2. Remove WP version (or change it)
+add_filter('update_footer', function () {
+    return ''; // empty or your custom text
+}, 9999);
+
+// 3. Replace "Howdy" with "Welcome" + username
+add_filter('admin_bar_menu', function ($wp_admin_bar) {
+    $user = wp_get_current_user();
+    $account = $wp_admin_bar->get_node('my-account');
+    if(!$account) return;
+
+    $new_title = str_replace('Howdy,', 'Welcome,', $account->title);
+    $account->title = $new_title;
+    $wp_admin_bar->add_node($account);
+}, 25);
+
+// 4. Remove WP logo from admin bar
+add_action('admin_bar_menu', function ($wp_admin_bar) {
+    $wp_admin_bar->remove_node('wp-logo');
+}, 999);
+
+// 5. Remove update/version nags
+add_filter('update_nag', '__return_empty_string');
+add_filter('core_update_footer', '__return_empty_string');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+add_filter('use_block_editor_for_post', '__return_false');
+add_filter('user_can_richedit', '__return_false');
+
+add_action('admin_enqueue_scripts', function ($hook) {
+    if (!in_array($hook, ['post.php', 'post-new.php'])) return;
+
+    wp_enqueue_style('hljs-css', 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css');
+    wp_enqueue_script('hljs-js', 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js', [], null, true);
+    wp_enqueue_style('easymde-css', 'https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css');
+    wp_enqueue_script('easymde-js', 'https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js', [], null, true);
+});
+
+add_action('admin_footer', function () {
+    $screen = get_current_screen();
+    if (!$screen || $screen->base !== 'post') return;
+    ?>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const editor = new EasyMDE({
+            element: document.getElementById('content'),
+            forceSync: true,
+            spellChecker: false,
+            autofocus: true,
+            sideBySideFullscreen: false, 
+            minHeight: "700px",
+            toolbar: [
+                "bold", "italic", "|", "heading-1", "heading-2", "heading-3", "|", 
+                "quote", "code", "unordered-list", "ordered-list", "|", 
+                "link", "image", "horizontal-rule", "|", "side-by-side", "fullscreen"
+            ],
+            renderingConfig: {
+                codeSyntaxHighlighting: true,
+            }
+        });
+    });
+    </script>
+
+    <style>
+    /* 1. ROOT COLORS - GITHUB DARK VIBE */
+    :root {
+        --bg-main: #0d1117;
+        --bg-side: #161b22;
+        --border-color: #30363d;
+        --accent: #58a6ff;
+        --text-editor: #c9d1d9;
+        --text-preview: #ecf2f8;
+        --list-bullet: #58a6ff;
+    }
+
+    #postdivrich { background: var(--bg-main) !important; border: none; }
+    
+    /* 2. TOOLBAR & LAYOUT */
+    .editor-toolbar {
+        background: var(--bg-side) !important;
+        border: 1px solid var(--border-color) !important;
+        border-bottom: none !important;
+        border-radius: 8px 8px 0 0;
+    }
+    .editor-toolbar a { color: #8b949e !important; }
+    .editor-toolbar a:hover, .editor-toolbar a.active { 
+        background: var(--border-color) !important; 
+        color: var(--accent) !important; 
+    }
+
+    /* Left Side: Source */
+    .CodeMirror {
+        background: var(--bg-main) !important;
+        color: var(--text-editor) !important;
+        font-family: 'JetBrains Mono', 'Fira Code', monospace !important;
+        font-size: 14px;
+        line-height: 1.6;
+        border: 1px solid var(--border-color) !important;
+    }
+
+    /* Right Side: Preview */
+    .editor-preview-side {
+        background: var(--bg-side) !important;
+        border: 1px solid var(--border-color) !important;
+        border-left: 2px solid var(--accent) !important; 
+        color: var(--text-preview) !important;
+        padding: 30px !important;
+    }
+
+    /* 3. FIXING LISTS (BULLET POINTS) - FORCES VISIBILITY IN WP ADMIN */
+    .editor-preview-side ul, 
+    .editor-preview ul {
+        list-style-type: disc !important;
+        padding-left: 25px !important;
+        margin: 1em 0 !important;
+        display: block !important;
+    }
+
+    .editor-preview-side ol, 
+    .editor-preview ol {
+        list-style-type: decimal !important;
+        padding-left: 25px !important;
+        margin: 1em 0 !important;
+        display: block !important;
+    }
+
+    .editor-preview-side li, 
+    .editor-preview li {
+        display: list-item !important;
+        margin-bottom: 0.5em !important;
+        line-height: 1.6;
+    }
+
+    .editor-preview-side ul li::marker {
+        color: var(--list-bullet);
+    }
+
+    /* 4. PREVIEW ELEMENTS IMPROVEMENTS */
+    .editor-preview-side hr {
+        height: 1px;
+        background-color: var(--border-color);
+        border: none;
+        margin: 2em 0;
+    }
+
+    .editor-preview-side h1, .editor-preview-side h2, .editor-preview-side h3 {
+        color: var(--accent);
+        padding-bottom: 0.3em;
+        margin-top: 1.5em;
+    }
+
+    .editor-preview-side code {
+        padding: 0.2em 0.4em;
+        border-radius: 6px;
+        font-family: monospace;
+        color: #ff7b72;
+    }
+
+    .editor-preview-side pre {
+        background: #010409 !important;
+        padding: 16px;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        overflow: auto;
+    }
+
+    .editor-preview-side blockquote {
+        border-left: 4px solid var(--border-color);
+        color: #8b949e;
+        padding-left: 16px;
+        margin: 1.5em 0;
+    }
+
+    .editor-preview-side img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 6px;
+    }
+
+    /* 5. SCROLLBAR CUSTOMIZATION */
+    .CodeMirror-vscrollbar::-webkit-scrollbar,
+    .editor-preview-side::-webkit-scrollbar {
+        width: 10px;
+    }
+    .CodeMirror-vscrollbar::-webkit-scrollbar-track,
+    .editor-preview-side::-webkit-scrollbar-track {
+        background: var(--bg-main);
+    }
+    .CodeMirror-vscrollbar::-webkit-scrollbar-thumb,
+    .editor-preview-side::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: 5px;
+    }
+
+    /* 6. EDITOR TOKEN COLORS */
+    .cm-s-easymde .cm-header { color: var(--accent); font-weight: bold; }
+    .cm-s-easymde .cm-comment.cm-code { color: #ffa657; } 
+    .cm-s-easymde .cm-link { color: #a5d6ff; }
+    .cm-s-easymde .cm-string { color: #7ee787; }
+    .cm-s-easymde .cm-hr { color: var(--accent) !important; font-weight: bold; }
+    .CodeMirror-cursor { border-left: 2px solid var(--accent) !important; }
+
+    </style>
+    <?php
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * Modern Dark Mode WooCommerce Report Page
+ */
+
+add_action('admin_menu', 'register_modern_dark_report_page');
+
+function register_modern_dark_report_page() {
+    add_menu_page(
+        'Store Analytics',
+        'Modern Reports',
+        'manage_options',
+        'modern-dark-report',
+        'render_modern_dark_report',
+        'dashicons-chart-area',
+        2 // Position high in the menu
+    );
+}
+
+function render_modern_dark_report() {
+    global $wpdb;
+
+    // 1. DATA QUERIES
+    // Get total revenue (last 30 days)
+    $total_revenue = $wpdb->get_var("SELECT SUM(total_sales) FROM {$wpdb->prefix}wc_order_stats WHERE date_created > NOW() - INTERVAL 30 DAY");
+    
+    // Get total orders (last 30 days)
+    $total_orders = $wpdb->get_var("SELECT COUNT(order_id) FROM {$wpdb->prefix}wc_order_stats WHERE date_created > NOW() - INTERVAL 30 DAY");
+
+    // Get Recent Sales List
+    $recent_sales = $wpdb->get_results("
+        SELECT order_id, total_sales, date_created 
+        FROM {$wpdb->prefix}wc_order_stats 
+        ORDER BY date_created DESC LIMIT 5
+    ");
+
+    // 2. STYLES (Modern Dark Theme)
+    ?>
+    <style>
+        #wpcontent { background: #0f172a; } /* Deep Dark Background */
+        .modern-report-wrapper {
+            padding: 30px;
+            color: #f8fafc;
+            font-family: 'Inter', -apple-system, sans-serif;
+        }
+        .report-header { margin-bottom: 30px; }
+        .report-header h1 { color: #fff; font-size: 28px; font-weight: 700; margin: 0; }
+        
+        /* Grid Layout */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        /* Modern Cards */
+        .stat-card {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid #334155;
+            transition: transform 0.2s;
+        }
+        .stat-card:hover { border-color: #38bdf8; }
+        .stat-card .label { color: #94a3b8; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .stat-card .value { color: #fff; font-size: 32px; font-weight: 800; margin-top: 10px; display: block; }
+        .stat-card .trend { font-size: 12px; margin-top: 8px; color: #10b981; }
+
+        /* Modern Table */
+        .data-section {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid #334155;
+        }
+        .data-section h2 { color: #fff; font-size: 18px; margin-bottom: 20px; }
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .custom-table th {
+            text-align: left;
+            color: #94a3b8;
+            padding: 12px;
+            border-bottom: 1px solid #334155;
+            font-size: 13px;
+        }
+        .custom-table td {
+            padding: 16px 12px;
+            color: #e2e8f0;
+            border-bottom: 1px solid #334155;
+        }
+        .order-badge {
+            background: #334155;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #38bdf8;
+        }
+    </style>
+
+    <div class="modern-report-wrapper">
+        <div class="report-header">
+            <h1>Store Performance</h1>
+            <p style="color: #94a3b8;">Real-time insights for your WooCommerce store.</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="label">30-Day Revenue</span>
+                <span class="value">$<?php echo number_format($total_revenue, 2); ?></span>
+                <div class="trend">↑ 12% vs last month</div>
+            </div>
+            <div class="stat-card">
+                <span class="label">30-Day Orders</span>
+                <span class="value"><?php echo $total_orders; ?></span>
+                <div class="trend">↑ 5% vs last month</div>
+            </div>
+            <div class="stat-card">
+                <span class="label">Avg. Order Value</span>
+                <span class="value">$<?php echo ($total_orders > 0) ? number_format($total_revenue / $total_orders, 2) : '0'; ?></span>
+            </div>
+        </div>
+
+        <div class="data-section">
+            <h2>Recent Orders</h2>
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Date Created</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($recent_sales as $sale) : ?>
+                    <tr>
+                        <td><span class="order-badge">#<?php echo $sale->order_id; ?></span></td>
+                        <td><?php echo date('M j, Y', strtotime($sale->date_created)); ?></td>
+                        <td><strong>$<?php echo number_format($sale->total_sales, 2); ?></strong></td>
+                        <td style="color: #10b981;">Completed</td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <?php
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Register the custom menu page
+add_action('admin_menu', 'register_modern_plugin_manager');
+
+function register_modern_plugin_manager() {
+    add_menu_page(
+        'Custom Manager',
+        'Plugin Manager',
+        'activate_plugins', // Only users who can manage plugins see this
+        'modern-plugin-manager',
+        'render_modern_plugin_manager',
+        'dashicons-admin-plugins',
+        65
+    );
+}
+
+// Handle plugin actions (Activate/Deactivate/Delete)
+add_action('admin_init', 'handle_modern_plugin_actions');
+
+function handle_modern_plugin_actions() {
+    if (!isset($_GET['page']) || $_GET['page'] !== 'modern-plugin-manager') return;
+    if (!isset($_GET['plugin_action']) || !isset($_GET['plugin'])) return;
+
+    $action = $_GET['plugin_action'];
+    $plugin = $_GET['plugin'];
+
+    // Security Check
+    check_admin_referer('modern_plugin_action_' . $plugin);
+
+    if ($action === 'activate') {
+        activate_plugin($plugin);
+    } elseif ($action === 'deactivate') {
+        deactivate_plugins($plugin);
+    } elseif ($action === 'delete') {
+        delete_plugins(array($plugin));
+    }
+
+    // Redirect back to clean URL
+    wp_redirect(admin_url('admin.php?page=modern-plugin-manager&status=success'));
+    exit;
+}
+
+function render_modern_plugin_manager() {
+    if (!function_exists('get_plugins')) {
+        require_once ABSPATH . 'wp-admin/includes/plugin.php';
+    }
+
+    $all_plugins = get_plugins();
+    ?>
+    <style>
+        #wpcontent { background: #0f172a; margin-left: 0; }
+        .plugin-manager-wrap { padding: 40px; color: #f8fafc; font-family: 'Inter', system-ui, sans-serif; max-width: 1200px; }
+        .header { margin-bottom: 40px; border-left: 4px solid #38bdf8; padding-left: 20px; }
+        .header h1 { color: #fff; font-size: 32px; margin: 0; }
+        
+        /* Grid Layout */
+        .plugin-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+        
+        /* Modern Cards */
+        .plugin-card { 
+            background: #1e293b; border-radius: 16px; padding: 25px; 
+            border: 1px solid #334155; position: relative; 
+            display: flex; flex-direction: column; justify-content: space-between;
+        }
+        .plugin-card.active { border-left: 5px solid #10b981; }
+        .plugin-card h3 { margin: 0 0 10px 0; color: #fff; font-size: 18px; }
+        .plugin-card .version { font-size: 12px; color: #64748b; background: #0f172a; padding: 2px 8px; border-radius: 4px; }
+        .plugin-card .desc { color: #94a3b8; font-size: 14px; line-height: 1.5; margin: 15px 0; min-height: 60px; }
+
+        /* Modern Buttons */
+        .actions { display: flex; gap: 10px; margin-top: auto; padding-top: 20px; border-top: 1px solid #334155; }
+        .btn { 
+            text-decoration: none; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; 
+            transition: all 0.2s; text-align: center; flex: 1;
+        }
+        .btn-activate { background: #10b981; color: white; }
+        .btn-activate:hover { background: #059669; }
+        .btn-deactivate { background: #334155; color: #e2e8f0; }
+        .btn-deactivate:hover { background: #475569; }
+        .btn-delete { background: #ef4444; color: white; }
+        .btn-delete:hover { background: #dc2626; }
+    </style>
+
+    <div class="plugin-manager-wrap">
+        <div class="header">
+            <h1>Plugin Commander</h1>
+            <p>Modern management for your WordPress ecosystem.</p>
+        </div>
+
+        <div class="plugin-grid">
+            <?php foreach ($all_plugins as $file => $data) : 
+                $is_active = is_plugin_active($file);
+                $nonce_url = wp_create_nonce('modern_plugin_action_' . $file);
+                $base_url = admin_url('admin.php?page=modern-plugin-manager&plugin=' . $file . '&_wpnonce=' . $nonce_url);
+            ?>
+                <div class="plugin-card <?php echo $is_active ? 'active' : ''; ?>">
+                    <div>
+                        <h3><?php echo esc_html($data['Name']); ?> <span class="version">v<?php echo $data['Version']; ?></span></h3>
+                        <p class="desc"><?php echo wp_trim_words($data['Description'], 20); ?></p>
+                    </div>
+
+                    <div class="actions">
+                        <?php if ($is_active) : ?>
+                            <a href="<?php echo $base_url . '&plugin_action=deactivate'; ?>" class="btn btn-deactivate">Deactivate</a>
+                        <?php else : ?>
+                            <a href="<?php echo $base_url . '&plugin_action=activate'; ?>" class="btn btn-activate">Activate</a>
+                            <a href="<?php echo $base_url . '&plugin_action=delete'; ?>" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete this plugin?')">Delete</a>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <?php
+}
+
+
+
+
+
+
+
+
+
+
+/**
+ * Modern Dark Mode Post & Product Manager
+ */
+
+add_action('admin_menu', 'register_modern_content_manager');
+
+function register_modern_content_manager() {
+    add_menu_page(
+        'Content Manager',
+        'Quick Manage',
+        'edit_posts',
+        'modern-content-manager',
+        'render_modern_content_manager',
+        'dashicons-store',
+        4
+    );
+}
+
+function render_modern_content_manager() {
+    $current_tab = isset($_GET['tab']) ? $_GET['tab'] : 'products';
+    $post_type = ($current_tab == 'products') ? 'product' : 'post';
+
+    // Fetch Items
+    $items = get_posts([
+        'post_type' => $post_type,
+        'posts_per_page' => 12,
+        'post_status' => 'any'
+    ]);
+
+    ?>
+    <style>
+        #wpcontent { background: #0f172a; }
+        .manager-wrap { padding: 30px; color: #f8fafc; font-family: 'Inter', sans-serif; }
+        
+        /* Tabs Styling */
+        .tab-nav { display: flex; gap: 10px; margin-bottom: 30px; border-bottom: 1px solid #334155; padding-bottom: 15px; }
+        .tab-nav a { 
+            text-decoration: none; color: #94a3b8; padding: 10px 20px; border-radius: 8px; 
+            font-weight: 600; transition: 0.3s;
+        }
+        .tab-nav a.active { background: #38bdf8; color: #fff; }
+
+        /* Grid */
+        .content-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        
+        .item-card { 
+            background: #1e293b; border: 1px solid #334155; border-radius: 12px; 
+            overflow: hidden; display: flex; flex-direction: column;
+        }
+        .item-thumb { 
+            height: 160px; background: #0f172a; display: flex; align-items: center; 
+            justify-content: center; position: relative; 
+        }
+        .item-thumb img { width: 100%; height: 100%; object-fit: cover; opacity: 0.7; }
+        
+        .item-details { padding: 20px; flex-grow: 1; }
+        .item-details h3 { margin: 0 0 10px 0; font-size: 16px; color: #fff; height: 45px; overflow: hidden; }
+        
+        .badge { font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: bold; text-transform: uppercase; }
+        .badge-instock { background: #10b98122; color: #10b981; }
+        .badge-draft { background: #f59e0b22; color: #f59e0b; }
+        .badge-price { color: #38bdf8; font-size: 18px; font-weight: 800; display: block; margin-top: 10px; }
+
+        .item-actions { 
+            display: grid; grid-template-columns: 1fr 1fr; gap: 1px; 
+            background: #334155; border-top: 1px solid #334155; 
+        }
+        .item-actions a { 
+            background: #1e293b; color: #94a3b8; text-align: center; 
+            padding: 12px; text-decoration: none; font-size: 12px; transition: 0.2s;
+        }
+        .item-actions a:hover { background: #334155; color: #fff; }
+        .btn-trash:hover { color: #ef4444 !important; }
+    </style>
+
+    <div class="manager-wrap">
+        <header>
+            <h1 style="color:#fff;">Content Commander</h1>
+            <div class="tab-nav">
+                <a href="?page=modern-content-manager&tab=products" class="<?php echo $current_tab == 'products' ? 'active' : ''; ?>">Products</a>
+                <a href="?page=modern-content-manager&tab=posts" class="<?php echo $current_tab == 'posts' ? 'active' : ''; ?>">Blog Posts</a>
+            </div>
+        </header>
+
+        <div class="content-grid">
+            <?php foreach ($items as $item) : 
+                $img = get_the_post_thumbnail_url($item->ID, 'medium');
+                $status = get_post_status($item->ID);
+                //$edit_link = get_edit_post_link($item->ID);
+				$edit_link = admin_url('admin.php?page=modern-editor&id=' . $item->ID);
+                $view_link = get_permalink($item->ID);
+                $delete_link = get_delete_post_link($item->ID);
+            ?>
+                <div class="item-card">
+                    <div class="item-thumb">
+                        <?php if ($img) : ?>
+                            <img src="<?php echo $img; ?>">
+                        <?php else : ?>
+                            <span class="dashicons dashicons-format-image" style="font-size: 40px; color: #334155;"></span>
+                        <?php endif; ?>
+                    </div>
+                    
+                    <div class="item-details">
+                        <span class="badge <?php echo $status == 'publish' ? 'badge-instock' : 'badge-draft'; ?>">
+                            <?php echo $status; ?>
+                        </span>
+                        <h3><?php echo esc_html($item->post_title); ?></h3>
+                        
+                        <?php if ($current_tab == 'products' && function_exists('wc_get_product')) : 
+                            $product = wc_get_product($item->ID); ?>
+                            <span class="badge-price"><?php echo $product->get_price_html(); ?></span>
+                        <?php endif; ?>
+                    </div>
+
+                    <div class="item-actions">
+                        <a href="<?php echo $edit_link; ?>">Edit</a>
+                        <a href="<?php echo $view_link; ?>" target="_blank">View</a>
+                        <a href="<?php echo $delete_link; ?>" class="btn-trash" onclick="return confirm('Move to trash?')">Trash</a>
+                        <a href="#" style="opacity: 0.5; pointer-events: none;">Duplicate</a>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <?php
+}
+
+
+
+
+
+
+
+
+
+/**
+ * Modern Dark Mode Content Editor
+ */
+
+add_action('admin_menu', 'register_modern_editor_page');
+
+function register_modern_editor_page() {
+    add_submenu_page(
+        null, // No parent (hidden from menu, accessed via link)
+        'Modern Editor',
+        'Modern Editor',
+        'edit_posts',
+        'modern-editor',
+        'render_modern_editor'
+    );
+}
+
+// Handle the Save Action
+add_action('admin_init', 'handle_modern_editor_save');
+function handle_modern_editor_save() {
+    if (isset($_POST['modern_editor_save']) && check_admin_referer('modern_editor_action')) {
+        $post_id = intval($_POST['post_id']);
+        
+        $updated_post = array(
+            'ID'           => $post_id,
+            'post_title'   => sanitize_text_field($_POST['post_title']),
+            'post_content' => wp_kses_post($_POST['post_content']),
+            'post_status'  => sanitize_text_field($_POST['post_status']),
+        );
+
+        wp_update_post($updated_post);
+
+        // If it's a WooCommerce Product, update the price
+        if (isset($_POST['product_price']) && function_exists('wc_get_product')) {
+            update_post_meta($post_id, '_regular_price', sanitize_text_field($_POST['product_price']));
+            update_post_meta($post_id, '_price', sanitize_text_field($_POST['product_price']));
+        }
+
+        wp_redirect(admin_url('admin.php?page=modern-content-manager&status=updated'));
+        exit;
+    }
+}
+
+function render_modern_editor() {
+    $post_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+    $post = get_post($post_id);
+
+    if (!$post) {
+        echo '<div class="wrap"><h1>Post not found.</h1></div>';
+        return;
+    }
+
+    $is_product = (get_post_type($post_id) == 'product');
+    $price = $is_product ? get_post_meta($post_id, '_regular_price', true) : '';
+
+    ?>
+    <style>
+        #wpcontent { background: #0f172a; }
+        .editor-wrap { padding: 40px; color: #f8fafc; font-family: 'Inter', sans-serif; max-width: 900px; margin: 0 auto; }
+        .editor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .back-link { color: #38bdf8; text-decoration: none; font-size: 14px; }
+        
+        .edit-card { background: #1e293b; border-radius: 16px; padding: 40px; border: 1px solid #334155; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        
+        .form-group { margin-bottom: 25px; }
+        .form-group label { display: block; color: #94a3b8; margin-bottom: 10px; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .modern-input { 
+            width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 8px; 
+            padding: 12px 15px; color: #fff; font-size: 16px; transition: 0.3s;
+        }
+        .modern-input:focus { border-color: #38bdf8; outline: none; box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2); }
+        
+        textarea.modern-input { min-height: 300px; line-height: 1.6; font-family: inherit; }
+        
+        .save-btn { 
+            background: #38bdf8; color: #fff; border: none; padding: 15px 40px; 
+            border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s;
+        }
+        .save-btn:hover { background: #0ea5e9; transform: translateY(-2px); }
+        
+        .status-select { cursor: pointer; }
+    </style>
+
+    <div class="editor-wrap">
+        <div class="editor-header">
+            <div>
+                <a href="?page=modern-content-manager" class="back-link">← Back to Manager</a>
+                <h1 style="color:#fff; margin-top:10px;">Edit <?php echo ucfirst(get_post_type($post_id)); ?></h1>
+            </div>
+            <div class="badge-instock" style="background: #38bdf822; color: #38bdf8; padding: 5px 12px; border-radius: 20px; font-size: 12px;">
+                ID: #<?php echo $post_id; ?>
+            </div>
+        </div>
+
+        <form method="post" action="">
+            <?php wp_nonce_field('modern_editor_action'); ?>
+            <input type="hidden" name="post_id" value="<?php echo $post_id; ?>">
+
+            <div class="edit-card">
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" name="post_title" class="modern-input" value="<?php echo esc_attr($post->post_title); ?>">
+                </div>
+
+                <?php if ($is_product) : ?>
+                <div class="form-group">
+                    <label>Price ($)</label>
+                    <input type="number" step="0.01" name="product_price" class="modern-input" value="<?php echo esc_attr($price); ?>">
+                </div>
+                <?php endif; ?>
+
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="post_status" class="modern-input status-select">
+                        <option value="publish" <?php selected($post->post_status, 'publish'); ?>>Published</option>
+                        <option value="draft" <?php selected($post->post_status, 'draft'); ?>>Draft</option>
+                        <option value="private" <?php selected($post->post_status, 'private'); ?>>Private</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Content</label>
+                    <textarea name="post_content" class="modern-input"><?php echo esc_textarea($post->post_content); ?></textarea>
+                </div>
+
+                <button type="submit" name="modern_editor_save" class="save-btn">Save Changes</button>
+            </div>
+        </form>
+    </div>
+    <?php
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function remove_admin_menus() {
+
+    // Core menu items
+    remove_menu_page('edit.php');                  // Posts
+    remove_menu_page('edit.php?post_type=page');   // Pages
+    remove_menu_page('edit-comments.php');         // Comments
+    remove_menu_page('tools.php');                 // Tools
+    remove_menu_page('options-general.php');       // Settings
+
+}
+add_action('admin_menu', 'remove_admin_menus', 999);
+
+function remove_admin_submenus() {
+
+    // Settings submenus
+    remove_submenu_page('options-general.php', 'options-writing.php');
+    remove_submenu_page('options-general.php', 'options-reading.php');
+    remove_submenu_page('options-general.php', 'options-discussion.php');
+
+    // Tools submenus
+    remove_submenu_page('tools.php', 'import.php');
+    remove_submenu_page('tools.php', 'export.php');
+
+}
+add_action('admin_menu', 'remove_admin_submenus', 999);
+
+add_action('wp_before_admin_bar_render', function () {
+    global $wp_admin_bar;
+
+    $wp_admin_bar->remove_node('new-post');
+    $wp_admin_bar->remove_node('comments');
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// 1. Register the Sidebar Menus
+add_action('admin_menu', 'register_modern_order_system');
+function register_modern_order_system() {
+    // Main Listing Page
+    add_menu_page(
+        'Modern Orders',
+        'Modern Orders',
+        'manage_woocommerce',
+        'modern-orders-list',
+        'render_modern_orders_list',
+        'dashicons-cart',
+        56
+    );
+
+    // Hidden Editor Page (Accessed via Edit links)
+    add_submenu_page(
+        null,
+        'Edit Order',
+        'Edit Order',
+        'manage_woocommerce',
+        'modern-order-editor',
+        'render_modern_order_editor'
+    );
+}
+
+// 2. Handle the Save Action
+add_action('admin_init', 'handle_modern_order_save');
+function handle_modern_order_save() {
+    if (isset($_POST['modern_order_save']) && check_admin_referer('modern_order_action')) {
+        $order_id = intval($_POST['order_id']);
+        $order = wc_get_order($order_id);
+
+        if ($order) {
+            // Update Status
+            $order->update_status(sanitize_text_field($_POST['order_status']));
+            
+            // Update Receipt Meta (The "Receipt" Column data)
+            if (isset($_POST['order_receipt'])) {
+                $order->update_meta_data('_receipt_link', sanitize_text_field($_POST['order_receipt']));
+            }
+
+            $order->save();
+
+            // Redirect back to list or editor with success
+            wp_redirect(admin_url('admin.php?page=modern-orders-list&status=updated'));
+            exit;
+        }
+    }
+}
+
+// 3. Render the Grid Listing (No Tables)
+function render_modern_orders_list() {
+    $query = new WC_Order_Query(array(
+        'limit' => 20,
+        'orderby' => 'date',
+        'order' => 'DESC',
+    ));
+    $orders = $query->get_orders();
+
+    ?>
+    <style>
+        #wpcontent { background: #0f172a; }
+        .list-wrap { padding: 40px; color: #f8fafc; font-family: 'Inter', sans-serif; max-width: 1200px; margin: 0 auto; }
+        .orders-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-top: 30px; }
+        .order-card { 
+            background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 25px; 
+            text-decoration: none; color: inherit; transition: 0.3s; display: block;
+        }
+        .order-card:hover { border-color: #38bdf8; transform: translateY(-3px); background: #232e42; }
+        .order-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+        .order-id { font-size: 20px; font-weight: 800; color: #fff; }
+        .status-badge { font-size: 11px; padding: 4px 10px; border-radius: 6px; text-transform: uppercase; font-weight: 700; background: #334155; }
+        .cust-name { color: #94a3b8; margin-bottom: 5px; font-size: 14px; }
+        .order-total { font-size: 22px; font-weight: 700; color: #fff; }
+        .receipt-indicator { margin-top: 15px; padding-top: 15px; border-top: 1px solid #334155; font-size: 12px; display: flex; align-items: center; }
+        .dot { height: 8px; width: 8px; border-radius: 50%; display: inline-block; margin-right: 8px; }
+    </style>
+
+    <div class="list-wrap">
+        <h1 style="color:#fff;">Store Orders</h1>
+        <div class="orders-grid">
+            <?php foreach ($orders as $order) : 
+                $receipt = $order->get_meta('_receipt_link');
+                $status = $order->get_status();
+                $edit_url = admin_url('admin.php?page=modern-order-editor&id=' . $order->get_id());
+            ?>
+                <a href="<?php echo $edit_url; ?>" class="order-card">
+                    <div class="order-header">
+                        <span class="order-id">#<?php echo $order->get_order_number(); ?></span>
+                        <span class="status-badge"><?php echo $status; ?></span>
+                    </div>
+                    <div class="cust-name"><?php echo $order->get_billing_first_name() . ' ' . $order->get_billing_last_name(); ?></div>
+                    <div class="order-total"><?php echo $order->get_formatted_order_total(); ?></div>
+                    
+                    <div class="receipt-indicator">
+                        <?php if($receipt): ?>
+                            <span class="dot" style="background:#10b981;"></span> Receipt Attached
+                        <?php else: ?>
+                            <span class="dot" style="background:#64748b;"></span> No Receipt
+                        <?php endif; ?>
+                    </div>
+                </a>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <?php
+}
+
+// 4. Render the Modern Editor Page
+function render_modern_order_editor() {
+    $order_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+    $order = wc_get_order($order_id);
+
+    if (!$order) {
+        echo '<div class="wrap"><h1 style="color:#fff;">Order not found.</h1></div>';
+        return;
+    }
+
+    $receipt_val = $order->get_meta('_receipt_link');
+
+    ?>
+    <style>
+        #wpcontent { background: #0f172a; }
+        .editor-wrap { padding: 40px; color: #f8fafc; font-family: 'Inter', sans-serif; max-width: 800px; margin: 0 auto; }
+        .back-link { color: #38bdf8; text-decoration: none; display: inline-block; margin-bottom: 20px; }
+        .edit-card { background: #1e293b; border-radius: 16px; padding: 40px; border: 1px solid #334155; }
+        .form-group { margin-bottom: 25px; }
+        label { display: block; color: #94a3b8; margin-bottom: 10px; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; }
+        .modern-input { 
+            width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 8px; 
+            padding: 12px 15px; color: #fff; font-size: 16px; transition: 0.3s;
+        }
+        .modern-input:focus { border-color: #38bdf8; outline: none; box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2); }
+        .save-btn { 
+            background: #38bdf8; color: #fff; border: none; padding: 15px 40px; 
+            border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; width: 100%;
+        }
+    </style>
+
+    <div class="editor-wrap">
+        <a href="?page=modern-orders-list" class="back-link">← Back to Orders</a>
+        <h1 style="color:#fff;">Edit Order #<?php echo $order_id; ?></h1>
+
+        <form method="post" action="">
+            <?php wp_nonce_field('modern_order_action'); ?>
+            <input type="hidden" name="order_id" value="<?php echo $order_id; ?>">
+
+            <div class="edit-card">
+                <div class="form-group">
+                    <label>Order Status</label>
+                    <select name="order_status" class="modern-input">
+                        <?php foreach (wc_get_order_statuses() as $key => $label) : ?>
+                            <option value="<?php echo str_replace('wc-', '', $key); ?>" <?php selected('wc-'.$order->get_status(), $key); ?>>
+                                <?php echo $label; ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Receipt Link / ID</label>
+                    <input type="text" name="order_receipt" class="modern-input" value="<?php echo esc_attr($receipt_val); ?>" placeholder="Enter receipt URL or reference...">
+                    <?php if($receipt_val): ?>
+                        <p style="font-size:12px; margin-top:8px;"><a href="<?php echo esc_url($receipt_val); ?>" target="_blank" style="color:#38bdf8;">Open Current Receipt ↗</a></p>
+                    <?php endif; ?>
+                </div>
+
+                <div style="background:#0f172a; padding:20px; border-radius:8px; margin-bottom:30px;">
+                    <p style="margin:0; color:#94a3b8;">Customer: <span style="color:#fff;"><?php echo $order->get_billing_email(); ?></span></p>
+                    <p style="margin:10px 0 0 0; color:#94a3b8;">Total Amount: <span style="color:#fff; font-size:18px;"><?php echo $order->get_formatted_order_total(); ?></span></p>
+                </div>
+
+                <button type="submit" name="modern_order_save" class="save-btn">Save Order Changes</button>
+            </div>
+        </form>
+    </div>
+    <?php
+}
+
+
+
+
+
+
+
+
+
+
+add_action('admin_footer', function() {
+    ?>
+    <script>
+jQuery(document).ready(function($) {
+    // 1. Listen for clicks on admin menu links
+    $(document).on('click', '#adminmenu a', function(e) {
+        const url = $(this).attr('href');
+
+        // Only AJAX-load internal admin links (skip logout or external links)
+        if (!url || url.indexOf('wp-login.php') !== -1 || url.indexOf('logout') !== -1) {
+            return;
+        }
+
+        e.preventDefault();
+
+        // 2. Visual feedback (optional)
+        $('#wpbody').css('opacity', '0.5');
+
+        // 3. Fetch the new page
+        $.ajax({
+            url: url,
+            method: 'GET',
+            success: function(data) {
+                // 4. Parse the response and extract only the #wpbody content
+                const newContent = $(data).find('#wpbody-content').html();
+                
+                // 5. Update the DOM
+                $('#wpbody-content').html(newContent);
+                $('#wpbody').css('opacity', '1');
+
+                // 6. Update the browser URL and page title
+                window.history.pushState({path: url}, '', url);
+                
+                // 7. Re-highlight the active menu item
+                $('#adminmenu li').removeClass('current');
+                $(e.currentTarget).parent('li').addClass('current');
+            },
+            error: function() {
+                window.location.href = url; // Fallback if AJAX fails
+            }
+        });
+    });
+
+    // 8. Handle the Back/Forward buttons
+    window.onpopstate = function() {
+        window.location.reload(); // Simple fix for history navigation
+    };
+});    </script>
+    <?php
+});
