@@ -8,8 +8,8 @@ add_action('plugins_loaded', function () {
 
 add_action('adminmenu', function() {
     $logo = plugin_dir_url(__FILE__) . 'imgs/1.png';
-    echo '<div style="order: -1; width: 100%; margin: auto" class="custom-admin-logo">
-            <img style="width: 100%" src="' . esc_url($logo) . '" alt="Logo">
+    echo '<div style="order: -1; max-width: 85px; width: 100%; margin: auto" class="custom-admin-logo">
+            <img style="filter: brightness(0) invert(1); width: 100%" src="' . esc_url($logo) . '" alt="Logo">
           </div>';
 });
 

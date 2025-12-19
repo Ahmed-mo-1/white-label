@@ -312,15 +312,15 @@ function mat_register_menus() {
 function mat_get_styles() {
     ?>
     <style>
-        #wpcontent { background: #0f172a; padding: 0; }
+        #wpcontent { background: #252525; padding: 0; }
         .admin-wrap { padding: 40px; color: #f8fafc; font-family: 'Inter', sans-serif; max-width: 1100px; margin: 0 auto; }
-        .card-bg { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 25px; margin-bottom: 25px; }
+        .card-bg { background: #303030; border: 1px solid #334155; border-radius: 12px; padding: 25px; margin-bottom: 25px; }
         .modern-table { width: 100%; border-collapse: collapse; }
         .modern-table th { text-align: left; padding: 12px; border-bottom: 2px solid #334155; color: #94a3b8; font-size: 12px; text-transform: uppercase; }
         .modern-table td { padding: 15px 12px; border-bottom: 1px solid #334155; font-size: 14px; }
         .btn-primary { background: #38bdf8; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration: none; border: none; cursor: pointer; font-weight: 600; display: inline-block; }
         .btn-danger { background: #ef4444; color: #fff; padding: 6px 12px; border-radius: 4px; text-decoration: none; border: none; cursor: pointer; font-size: 11px; }
-        .input-dark { background: #0f172a; border: 1px solid #334155; color: #fff; padding: 10px; border-radius: 6px; width: 100%; max-width: 400px; margin-top: 5px; }
+        .input-dark { background: #252525; border: 1px solid #334155; color: #fff; padding: 10px; border-radius: 6px; width: 100%; max-width: 400px; margin-top: 5px; }
         label { display: block; color: #94a3b8; font-size: 13px; margin-top: 15px; }
         .app-pass-box { background: #064e3b; color: #34d399; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 18px; margin-bottom: 20px; border: 1px solid #059669; }
         .empty-state { color: #64748b; font-style: italic; font-size: 13px; text-align: center; padding: 20px; }
@@ -518,7 +518,7 @@ function mat_ajax_plugin_search() {
         foreach ($api->plugins as $p) {
             $link = wp_nonce_url(self_admin_url('update.php?action=install-plugin&plugin='.$p->slug), 'install-plugin_'.$p->slug);
             ?>
-            <div style="background:#1e293b; padding:20px; border-radius:12px; border:1px solid #334155; display:flex; flex-direction:column; justify-content:space-between;">
+            <div style="background:#303030; padding:20px; border-radius:12px; border:1px solid #334155; display:flex; flex-direction:column; justify-content:space-between;">
                 <div>
                     <img src="<?php echo $p->icons['default']; ?>" style="width:40px; border-radius:6px; margin-bottom:10px;">
                     <h4 style="margin:0;"><?php echo $p->name; ?></h4>
@@ -548,7 +548,7 @@ function mat_render_settings() {
     ?>
     <div class="admin-wrap">
         <h1>General Settings</h1>
-        <div class="card-bg" style="max-width: 600px;">
+        <div class="card-bg" style="display: flex; align-items: center; justify-content: center">
             <form method="post">
                 <label>Website Name</label>
                 <input type="text" name="blogname" class="input-dark" value="<?php echo esc_attr(get_option('blogname')); ?>">

@@ -39,7 +39,7 @@ function render_modern_dark_report() {
     // 2. STYLES (Modern Dark Theme)
     ?>
     <style>
-        #wpcontent { background: #0f172a; } /* Deep Dark Background */
+        #wpcontent { background: var(--background-color); } /* Deep Dark Background */
         .modern-report-wrapper {
             padding: 30px;
             color: #f8fafc;
@@ -58,7 +58,7 @@ function render_modern_dark_report() {
         
         /* Modern Cards */
         .stat-card {
-            background: #1e293b;
+            background: #202020;
             border-radius: 12px;
             padding: 24px;
             border: 1px solid #334155;
@@ -71,7 +71,7 @@ function render_modern_dark_report() {
 
         /* Modern Table */
         .data-section {
-            background: #1e293b;
+            background: #202020;
             border-radius: 12px;
             padding: 24px;
             border: 1px solid #334155;

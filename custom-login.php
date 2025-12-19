@@ -29,7 +29,7 @@ body {
 
 .design-container {
     width: 75%;
-    background: url("<?php echo get_stylesheet_directory_uri(); ?>/imgs/1.jpg") center/cover;
+    background: url("<?php echo plugin_dir_url(__FILE__); ?>/imgs/1.jpg") center/cover;
     transition: width 0.3s ease;
 }
 
@@ -249,8 +249,8 @@ input:-webkit-autofill:focus {
 <div class="login-container">
 
     <div style="width: 80px; aspect-ratio: 1; margin-bottom: 10px;">
-        <img style="width: 100%; height: auto; object-fit: contain;"
-             src="<?php echo get_stylesheet_directory_uri(); ?>/imgs/1.webp"
+        <img style="width: 100%; height: auto; object-fit: contain; filter: brightness(0)"
+             src="<?php echo plugin_dir_url(__FILE__); ?>/imgs/1.png"
              onerror="this.onerror=null;this.src='https://placehold.co/80x80/3858e9/ffffff?text=LOGO';"
              alt="Logo">
     </div>

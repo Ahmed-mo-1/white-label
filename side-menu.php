@@ -5,9 +5,9 @@
 */
 
 :root {
-    --side-bg: #0f172a;
-    --side-hover: #1e293b;
-    --side-active: #38bdf8;
+    --side-bg: #252525;
+    --side-hover: #202020;
+    --side-active: #fff;
     --side-border: #334155;
     --side-text: #94a3b8;
     --side-text-bright: #f8fafc;

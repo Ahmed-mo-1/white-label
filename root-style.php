@@ -2,7 +2,7 @@
 
 :root {
 	--primary-color : #505050;
-	--background-color : #000;
+	--background-color : #252525;
 	--background-light-color : #252525;
 	--text-color : #fff;
 }
@@ -157,4 +157,7 @@ div.woocommerce-message.updated {
 	display: none
 }
 
+#toplevel_page_logout-link {
+	order: 100
+}
 </style>

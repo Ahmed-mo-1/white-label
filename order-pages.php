@@ -60,12 +60,12 @@ function render_modern_orders_list() {
 
     ?>
     <style>
-        #wpcontent { background: #0f172a; }
+        #wpcontent { background: #252525; }
         .list-wrap { padding: 40px; color: #f8fafc; font-family: 'Inter', sans-serif; max-width: 1200px; margin: 0 auto; }
         .orders-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; margin-top: 30px; }
         
         .order-card { 
-            background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 25px; 
+            background: #202020; border: 1px solid #334155; border-radius: 12px; padding: 25px; 
             text-decoration: none; color: inherit; transition: 0.3s; display: flex; flex-direction: column;
             position: relative;
         }
@@ -215,21 +215,33 @@ function render_modern_order_editor() {
 
     ?>
     <style>
-        #wpcontent { background: #0f172a; }
+        #wpcontent { background: #252525; }
         .editor-wrap { padding: 40px; color: #f8fafc; font-family: 'Inter', sans-serif; max-width: 800px; margin: 0 auto; }
         .back-link { color: #38bdf8; text-decoration: none; display: inline-block; margin-bottom: 20px; }
-        .edit-card { background: #1e293b; border-radius: 16px; padding: 40px; border: 1px solid #334155; }
+        .edit-card { background: #202020; border-radius: 16px; padding: 40px; border: 1px solid #334155; }
         .form-group { margin-bottom: 25px; }
         label { display: block; color: #94a3b8; margin-bottom: 10px; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; }
         .modern-input { 
-            width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 8px; 
+            width: 100%; background: #252525; border: 1px solid #334155; border-radius: 8px; 
             padding: 12px 15px; color: #fff; font-size: 16px; transition: 0.3s;
         }
         .modern-input:focus { border-color: #38bdf8; outline: none; box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2); }
-        .save-btn { 
-            background: #38bdf8; color: #fff; border: none; padding: 15px 40px; 
-            border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; width: 100%;
-        }
+		.save-btn
+		 {
+			background: #38bdf8;
+			color: #fff;
+			border: none;
+			padding: 15px 40px;
+			border-radius: 8px;
+			font-size: 16px;
+			font-weight: 700;
+			cursor: pointer;
+			width: 100%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-weight: 600;
+		}
     </style>
 
     <div class="editor-wrap">
@@ -260,7 +272,7 @@ function render_modern_order_editor() {
                     <?php endif; ?>
                 </div>
 
-                <div style="background:#0f172a; padding:20px; border-radius:8px; margin-bottom:30px;">
+                <div style="background:#252525; padding:20px; border-radius:8px; margin-bottom:30px;">
                     <p style="margin:0; color:#94a3b8;">Customer: <span style="color:#fff;"><?php echo $order->get_billing_email(); ?></span></p>
                     <p style="margin:10px 0 0 0; color:#94a3b8;">Total Amount: <span style="color:#fff; font-size:18px;"><?php echo $order->get_formatted_order_total(); ?></span></p>
                 </div>

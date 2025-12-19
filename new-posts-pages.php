@@ -49,8 +49,8 @@ function render_modern_plugin_manager() {
     $all_plugins = get_plugins();
     ?>
     <style>
-        #wpcontent { background: #0f172a; margin-left: 0; }
-        .plugin-manager-wrap { padding: 40px; color: #f8fafc; font-family: 'Inter', system-ui, sans-serif; max-width: 1200px; }
+        #wpcontent { background: var(--background-color); margin-left: 0; }
+        .plugin-manager-wrap { padding: 40px; color: #f8fafc; font-family: 'Inter', system-ui, sans-serif; max-width: 100%; }
         .header { margin-bottom: 40px; border-left: 4px solid #38bdf8; padding-left: 20px; }
         .header h1 { color: #fff; font-size: 32px; margin: 0; }
         
@@ -59,13 +59,13 @@ function render_modern_plugin_manager() {
         
         /* Modern Cards */
         .plugin-card { 
-            background: #1e293b; border-radius: 16px; padding: 25px; 
+            background: #202020; border-radius: 16px; padding: 25px; 
             border: 1px solid #334155; position: relative; 
             display: flex; flex-direction: column; justify-content: space-between;
         }
         .plugin-card.active { border-left: 5px solid #10b981; }
         .plugin-card h3 { margin: 0 0 10px 0; color: #fff; font-size: 18px; }
-        .plugin-card .version { font-size: 12px; color: #64748b; background: #0f172a; padding: 2px 8px; border-radius: 4px; }
+        .plugin-card .version { font-size: 12px; color: #64748b; background: var(--background-color); padding: 2px 8px; border-radius: 4px; }
         .plugin-card .desc { color: #94a3b8; font-size: 14px; line-height: 1.5; margin: 15px 0; min-height: 60px; }
 
         /* Modern Buttons */
@@ -155,7 +155,7 @@ function render_modern_content_manager() {
 
     ?>
     <style>
-        #wpcontent { background: #0f172a; }
+        #wpcontent { background: var(--background-color); }
         .manager-wrap { padding: 30px; color: #f8fafc; font-family: 'Inter', sans-serif; }
         
         /* Tabs Styling */
@@ -170,11 +170,11 @@ function render_modern_content_manager() {
         .content-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
         
         .item-card { 
-            background: #1e293b; border: 1px solid #334155; border-radius: 12px; 
+            background: #202020; border: 1px solid #334155; border-radius: 12px; 
             overflow: hidden; display: flex; flex-direction: column;
         }
         .item-thumb { 
-            height: 160px; background: #0f172a; display: flex; align-items: center; 
+            height: 160px; background: var(--background-color); display: flex; align-items: center; 
             justify-content: center; position: relative; 
         }
         .item-thumb img { width: 100%; height: 100%; object-fit: cover; opacity: 0.7; }
@@ -192,7 +192,7 @@ function render_modern_content_manager() {
             background: #334155; border-top: 1px solid #334155; 
         }
         .item-actions a { 
-            background: #1e293b; color: #94a3b8; text-align: center; 
+            background: #303030; color: #94a3b8; text-align: center; 
             padding: 12px; text-decoration: none; font-size: 12px; transition: 0.2s;
         }
         .item-actions a:hover { background: #334155; color: #fff; }
@@ -316,28 +316,39 @@ function render_modern_editor() {
 
     ?>
     <style>
-        #wpcontent { background: #0f172a; }
+        #wpcontent { background: var(--background-color); }
         .editor-wrap { padding: 40px; color: #f8fafc; font-family: 'Inter', sans-serif; max-width: 900px; margin: 0 auto; }
         .editor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         .back-link { color: #38bdf8; text-decoration: none; font-size: 14px; }
         
-        .edit-card { background: #1e293b; border-radius: 16px; padding: 40px; border: 1px solid #334155; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        .edit-card { background: #202020; border-radius: 16px; padding: 40px; border: 1px solid #334155; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
         
         .form-group { margin-bottom: 25px; }
         .form-group label { display: block; color: #94a3b8; margin-bottom: 10px; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; }
         
         .modern-input { 
-            width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 8px; 
+            width: 100%; background: var(--background-color); border: 1px solid #334155; border-radius: 8px; 
             padding: 12px 15px; color: #fff; font-size: 16px; transition: 0.3s;
         }
         .modern-input:focus { border-color: #38bdf8; outline: none; box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2); }
         
         textarea.modern-input { min-height: 300px; line-height: 1.6; font-family: inherit; }
         
-        .save-btn { 
-            background: #38bdf8; color: #fff; border: none; padding: 15px 40px; 
-            border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s;
-        }
+		.save-btn {
+			background: #38bdf8;
+			color: #fff;
+			border: none;
+			padding: 15px 40px;
+			border-radius: 8px;
+			font-size: 16px;
+			font-weight: 700;
+			cursor: pointer;
+			transition: 0.2s;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-weight: 400;
+		}
         .save-btn:hover { background: #0ea5e9; transform: translateY(-2px); }
         
         .status-select { cursor: pointer; }
