@@ -50,7 +50,7 @@ add_filter('theme_page_templates', 'custom_allow_login_template');
 
 function custom_load_login_template($template) {
     if (is_page_template('custom-login.php')) {
-        $file = plugin_dir_path(__FILE__) . '/custom-login.php';
+        $file = plugin_dir_path(__FILE__) . 'custom-login.php';
         if (file_exists($file)) {
             return $file;
         }
