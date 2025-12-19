@@ -16,14 +16,13 @@ if (!defined('ABSPATH')) {
 /**
  * 1. Automatically create login page on theme activation
  */
+/*
 function custom_create_login_page() {
     $slug = 'custom-login';
 
-    // Check if page exists
     $page = get_page_by_path($slug);
 
     if (!$page) {
-        // Create the page
         $page_id = wp_insert_post([
             'post_title'   => 'Login',
             'post_name'    => $slug,
@@ -31,14 +30,39 @@ function custom_create_login_page() {
             'post_type'    => 'page',
         ]);
 
-        // Assign page template
         if ($page_id && !is_wp_error($page_id)) {
             update_post_meta($page_id, '_wp_page_template', 'custom-login.php');
         }
     }
 }
-//add_action('after_switch_theme', 'custom_create_login_page');
+*/
+
+function custom_create_login_page() {
+    $slug = 'custom-login';
+
+    // Check if page exists (including trashed pages)
+    $page = get_page_by_path($slug, OBJECT, 'page');
+
+    if (!$page) {
+        $page_id = wp_insert_post([
+            'post_title'   => 'Login',
+            'post_name'    => $slug,
+            'post_status'  => 'publish',
+            'post_type'    => 'page',
+            'post_content' => '', // You can add a shortcode here if needed
+        ]);
+
+        if ($page_id && !is_wp_error($page_id)) {
+            update_post_meta($page_id, '_wp_page_template', 'custom-login.php');
+        }
+        
+        // Ensure the new URL works immediately
+        flush_rewrite_rules();
+    }
+}
 register_activation_hook( __FILE__, 'custom_create_login_page' );
+
+//add_action('after_switch_theme', 'custom_create_login_page');
 
 /* -----------------------------------------------------------
    2. Allow WordPress to recognize custom-login.php template
