@@ -153,7 +153,7 @@ div.woocommerce-message.updated {
 }
 
 
-#astra-optin-notice, .notice e-notice e-notice--extended {
+#astra-optin-notice, .notice.e-notice.e-notice--extended {
 	display: none
 }
 
